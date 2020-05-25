@@ -1,0 +1,39 @@
+---
+title: "Reproducible Research Project 1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Loading and preprocessing the data  
+```{r ActivityMonitoring}
+library(lubridate)
+library(dplyr)
+filepath<-"D:/Data Science/repdata_data_activity/activity.csv"
+readData<-read.csv(filepath,header = TRUE,na.strings = "NA")
+readData_df<-tbl_df(readData)
+grup_date<-group_by(readData_df,date)
+#grup_date
+per_day<-summarise(grup_date,Total=length(date),sum_steps=sum(steps,na.rm = T))
+per_day
+histogram<-hist(per_day$sum_steps,xlab = "Total number of steps taken per day",main="Histogram of total number of steps taken per day", breaks = 25)
+#Mean per Day
+cal_mean<-mean(per_day$sum_steps)
+cal_mean
+#Median Per Day
+cal_median<-median(per_day$sum_steps)
+cal_median
+```
+##Make a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+```{r}
+library(ggplot2)
+five_min_steps <- aggregate(steps ~ interval, data = readData_df, FUN =mean)
+TimeSeriesPlot <- ggplot(data = five_min_steps, aes(x = interval, y = steps)) + 
+    geom_line() +
+    xlab("5 minutes interval") + 
+    ylab("Total Number of Steps") +
+    ggtitle("Average Number of Steps Taken of the 5-Minute Interval")
+print(TimeSeriesPlot)
+```
